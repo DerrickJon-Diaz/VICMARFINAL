@@ -102,7 +102,7 @@ const mockProperties = [
     property_type: "duplex",
     price: 2800000,
     location: "Batangas",
-    description: "The Premier Duplex represents the pinnacle of residential design, featuring sophisticated architecture with a primary configuration of 1 bedroom and 2 bathrooms. The flexible floor plan accommodates expanded family layouts with (optional: 3 bedrooms with 2 bathrooms or 2 bedrooms with 2 bathrooms). Defined by premium finishes, meticulous craftsmanship, and expansive living spaces, this residence embodies architectural excellence and contemporary luxury for the discerning homeowner.",
+    description: "The Premiere Duplex represents the pinnacle of residential design, featuring sophisticated architecture with a primary configuration of 1 bedroom and 2 bathrooms. The flexible floor plan accommodates expanded family layouts with (optional: 3 bedrooms with 2 bathrooms or 2 bedrooms with 2 bathrooms). Defined by premium finishes, meticulous craftsmanship, and expansive living spaces, this residence embodies architectural excellence and contemporary luxury for the discerning homeowner.",
     bedrooms: { default: 1, options: [3, 2] },
     bathrooms: { default: 2, options: [2] },
     floor_area: 59.32,

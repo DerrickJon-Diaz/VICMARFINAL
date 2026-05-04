@@ -56,7 +56,7 @@ const MAP_NATURAL_HEIGHT = 908;
 const TABLE_PAGE_SIZE = 15;
 const EMPTY_EDIT_FORM = {
   lotNum: "",
-  lotArea: "",
+  floorArea: "",
   price: "",
   blockNum: "",
   phase: "",
@@ -69,7 +69,7 @@ const TABLE_FILTER_FIELDS = [
   { key: "status", label: "Status", enabled: true },
   { key: "price", label: "Price", enabled: true },
   { key: "lotNum", label: "Lot", enabled: false },
-  { key: "lotArea", label: "Floor Area", enabled: false },
+  { key: "floorArea", label: "Floor Area", enabled: false },
   { key: "blockNum", label: "Block", enabled: false },
   { key: "phase", label: "Phase", enabled: false },
 ];
@@ -373,13 +373,14 @@ export default function AdminSlots({ readOnly = false }) {
       const override = statusOverrides[slot.slotId];
       const currentStatus = normalizeSlotStatus(override?.status ?? slot.defaultStatus);
       const currentMeta = getSlotStatusMeta(currentStatus);
-      const effectiveLotArea = override?.lotArea ?? slot.lotArea;
+      const effectiveFloorArea = override?.floorArea ?? override?.lotArea ?? slot.floorArea ?? slot.lotArea;
       const effectivePrice = override?.price ?? slot.price;
 
       return {
         ...slot,
         lotNum: resolveLotNumber(override?.lotNum, slot.lotNum),
-        lotArea: effectiveLotArea === "" || effectiveLotArea === undefined ? null : effectiveLotArea,
+        floorArea: effectiveFloorArea === "" || effectiveFloorArea === undefined ? null : effectiveFloorArea,
+        lotArea: effectiveFloorArea === "" || effectiveFloorArea === undefined ? null : effectiveFloorArea,
         price: effectivePrice === "" || effectivePrice === undefined ? null : effectivePrice,
         blockNum: String(override?.blockNum ?? slot.blockNum ?? "").trim(),
         phase: String(override?.phase ?? slot.phase ?? "").trim(),
@@ -484,8 +485,8 @@ export default function AdminSlots({ readOnly = false }) {
       return slot.lotNum || "-";
     }
 
-    if (fieldKey === "lotArea") {
-      return slot.lotArea ? `${slot.lotArea} m2` : "-";
+    if (fieldKey === "floorArea") {
+      return slot.floorArea ? `${slot.floorArea} sqm` : "-";
     }
 
     if (fieldKey === "price") {
@@ -568,9 +569,9 @@ export default function AdminSlots({ readOnly = false }) {
       if (sortConfig.key === 'lotNum') {
         aVal = extractLotSortValue(a.lotNum);
         bVal = extractLotSortValue(b.lotNum);
-      } else if (sortConfig.key === 'lotArea') {
-        aVal = a.lotArea ?? -1;
-        bVal = b.lotArea ?? -1;
+      } else if (sortConfig.key === 'floorArea') {
+        aVal = a.floorArea ?? a.lotArea ?? -1;
+        bVal = b.floorArea ?? b.lotArea ?? -1;
       } else if (sortConfig.key === 'price') {
         aVal = a.price ?? -1;
         bVal = b.price ?? -1;
@@ -651,6 +652,7 @@ export default function AdminSlots({ readOnly = false }) {
       mergeLocalSlotOverride(slot.slotId, {
         status,
         lotNum: slot.lotNum,
+        floorArea: slot.floorArea,
         lotArea: slot.lotArea,
         price: slot.price,
         blockNum: slot.blockNum,
@@ -677,7 +679,7 @@ export default function AdminSlots({ readOnly = false }) {
     setEditingSlotId(slot.slotId);
     setSlotEditForm({
       lotNum: slot.lotNum ?? "",
-      lotArea: slot.lotArea === null || slot.lotArea === undefined ? "" : String(slot.lotArea),
+      floorArea: slot.floorArea === null || slot.floorArea === undefined ? "" : String(slot.floorArea),
       price: slot.price === null || slot.price === undefined ? "" : String(slot.price),
       blockNum: slot.blockNum ?? "",
       phase: slot.phase ?? "",
@@ -715,13 +717,13 @@ export default function AdminSlots({ readOnly = false }) {
       : currentlyEditingSlot.unitKey
         ? `Unit ${currentlyEditingSlot.unitKey}`
         : "Selected slot";
-    const trimmedLotArea = slotEditForm.lotArea.trim();
+    const trimmedFloorArea = slotEditForm.floorArea.trim();
     const trimmedPrice = slotEditForm.price.trim();
 
-    if (trimmedLotArea) {
-      const parsedLotArea = Number(trimmedLotArea);
-      if (!Number.isFinite(parsedLotArea) || parsedLotArea < 0) {
-        toast.error("Lot area must be a valid non-negative number.");
+    if (trimmedFloorArea) {
+      const parsedFloorArea = Number(trimmedFloorArea);
+      if (!Number.isFinite(parsedFloorArea) || parsedFloorArea < 0) {
+        toast.error("Floor area must be a valid non-negative number.");
         return;
       }
     }
@@ -740,7 +742,7 @@ export default function AdminSlots({ readOnly = false }) {
     try {
       const nextDetails = {
         lotNum: effectiveLotNum,
-        lotArea: trimmedLotArea === "" ? null : Number(trimmedLotArea),
+        floorArea: trimmedFloorArea === "" ? null : Number(trimmedFloorArea),
         price: trimmedPrice === "" ? null : Number(trimmedPrice),
         blockNum: slotEditForm.blockNum.trim(),
         phase: slotEditForm.phase.trim(),
@@ -756,6 +758,7 @@ export default function AdminSlots({ readOnly = false }) {
       // Reflect detail edits immediately while awaiting snapshot propagation.
       mergeLocalSlotOverride(currentlyEditingSlot.slotId, {
         ...nextDetails,
+        lotArea: nextDetails.floorArea,
         status: currentlyEditingSlot.currentStatus,
         unitKey: currentlyEditingSlot.unitKey,
         sourceKey: currentlyEditingSlot.sourceKey,
@@ -1453,10 +1456,10 @@ export default function AdminSlots({ readOnly = false }) {
                   />
                 </label>
                 <label className="block">
-                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Lot Area (sqm)</span>
+                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Floor Area (sqm)</span>
                   <input
-                    value={slotEditForm.lotArea}
-                    onChange={(event) => handleSlotEditField("lotArea", event.target.value)}
+                    value={slotEditForm.floorArea}
+                    onChange={(event) => handleSlotEditField("floorArea", event.target.value)}
                     className="w-full rounded-xl border border-slate-200 bg-white shadow-sm px-3.5 py-2.5 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#15803d]/30 focus:border-[#15803d]/50 transition-all"
                   />
                 </label>

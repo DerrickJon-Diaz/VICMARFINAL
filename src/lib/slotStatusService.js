@@ -30,7 +30,8 @@ export function subscribeToSlotStatuses(onChange, onError) {
         nextStatuses[statusDocument.id] = {
           status: normalizeSlotStatus(data.status),
           lotNum: String(data.lotNum ?? "").trim(),
-          lotArea: toNullableNumber(data.lotArea),
+          floorArea: toNullableNumber(data.floorArea ?? data.lotArea),
+          lotArea: toNullableNumber(data.lotArea ?? data.floorArea),
           price: toNullableNumber(data.price),
           blockNum: String(data.blockNum ?? "").trim(),
           phase: String(data.phase ?? "").trim(),
@@ -59,7 +60,8 @@ export async function updateSlotStatus(slot, rawStatus, adminIdentifier) {
     {
       status: normalizedStatus,
       lotNum: slot.lotNum,
-      lotArea: slot.lotArea,
+        floorArea: toNullableNumber(slot.floorArea ?? slot.lotArea),
+        lotArea: toNullableNumber(slot.floorArea ?? slot.lotArea),
       price: toNullableNumber(slot.price),
       blockNum: slot.blockNum,
       phase: slot.phase,
@@ -84,7 +86,8 @@ export async function updateSlotDetails(slotId, details, adminIdentifier) {
     slotDocRef,
     {
       lotNum: String(details.lotNum ?? "").trim(),
-      lotArea: toNullableNumber(details.lotArea),
+      floorArea: toNullableNumber(details.floorArea ?? details.lotArea),
+      lotArea: toNullableNumber(details.floorArea ?? details.lotArea),
       price: toNullableNumber(details.price),
       blockNum: String(details.blockNum ?? "").trim(),
       phase: String(details.phase ?? "").trim(),

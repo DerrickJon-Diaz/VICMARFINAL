@@ -207,8 +207,41 @@ function getInteriorImages(property) {
   return getPropertyImages(property).slice(1);
 }
 
-function getInteriorImageLabel(image, fallbackIndex = 0) {
+function getInteriorImageLabel(image, fallbackIndex = 0, property = null) {
+  // Use property type and index-based mapping for accurate labeling
+  if (property) {
+    const propertyType = String(property.property_type ?? "").toLowerCase();
+    const title = String(property.title ?? "").toLowerCase();
+
+    // Duplex (Deluxe & Premiere) - 5 images
+    if (propertyType === "duplex" || title.includes("duplex")) {
+      const labels = [
+        "Dining Area",      // bintana
+        "Bedroom",          // bedroom scene 1 up
+        "Bedroom",          // bedroom scene 2 up
+        "Kitchen Area",     // duplex_img3
+        "Living Room"       // duplex_img5
+      ];
+      return labels[fallbackIndex] || `Interior ${fallbackIndex + 1}`;
+    }
+
+    // Rowhouse Economic Unit - 5 images
+    if (propertyType === "rowhouse" && title.includes("economic")) {
+      const labels = [
+        "Living Room",      // rowhouse int 1
+        "Kitchen Area",     // rowhouse int 2
+        "Dining Area",      // rowhouse int 3
+        "Bedroom",          // rowhouse int 4
+        "Bedroom"           // rowhouse int 5
+      ];
+      return labels[fallbackIndex] || `Interior ${fallbackIndex + 1}`;
+    }
+  }
+
   const source = String(image || "").toLowerCase();
+  if (source.includes("compound_img")) {
+    return "Loft Bedroom";
+  }
 
   if (source.includes("duplex_img3") || source.includes("socialized_img4")) {
     return "Kitchen Area";
@@ -218,16 +251,8 @@ function getInteriorImageLabel(image, fallbackIndex = 0) {
     return "Living Room 2";
   }
 
-  if (source.includes("duplex_img5")) {
-    return "Living Room 1";
-  }
-
   if (source.includes("socialized_img5")) {
     return "Dining Area";
-  }
-
-  if (source.includes("compound_img")) {
-    return "Loft Bedroom";
   }
 
   if (source.includes("duplex_img") || source.includes("socialized_img")) {
@@ -735,7 +760,7 @@ export default function PropertyTypeUnits() {
                               type="button"
                               onClick={() => openImageZoom({
                                 images: interiorImages,
-                                imageLabels: interiorImages.map((interiorImage, imageIndex) => getInteriorImageLabel(interiorImage, imageIndex)),
+                                imageLabels: interiorImages.map((interiorImage, imageIndex) => getInteriorImageLabel(interiorImage, imageIndex, property)),
                                 startIndex: index,
                                 titlePrefix: property.title,
                                 imageLabel: "Interior",

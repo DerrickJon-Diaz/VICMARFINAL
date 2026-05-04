@@ -231,6 +231,7 @@ function getUnitInfo(property, slotStatuses) {
       type: effectiveType,
       data: {
         ...unitEntry.data,
+        floorArea: slotOverride.floorArea ?? unitEntry.data.floorArea,
         lotNum: slotOverride.lotNum || unitEntry.data.lotNum,
         lotArea: slotOverride.lotArea ?? unitEntry.data.lotArea,
         price: slotOverride.price ?? unitEntry.data?.price ?? property.info?.price ?? null,
@@ -647,11 +648,7 @@ function getUnitFeatureItems(property, unit = null) {
   }
 
   if (floorArea) {
-    items.push(`${floorArea} Floor`);
-  }
-
-  if (lotArea) {
-    items.push(`${lotArea} Lot`);
+    items.push(`${floorArea} sqm`);
   }
 
   return items;
