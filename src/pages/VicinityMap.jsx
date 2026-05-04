@@ -348,7 +348,7 @@ function inferTypeFromCategory(category) {
   }
 
   if (normalizedCategory.includes("corner")) {
-    return "Corner Slot";
+    return "Corner Lot";
   }
 
   if (normalizedCategory.includes("triplex")) {
